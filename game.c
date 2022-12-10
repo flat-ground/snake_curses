@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ncurses.h>
 #include <unistd.h>
+#include <time.h>
 #include "snake.h"
 
 
@@ -17,8 +18,24 @@ static void init()
 	timeout(0);
 }
 
+void place_target(int max_x,int max_y)
+{
+	char c = '*';
+	int x, y;
+	
+	do{
+		x = rand() % max_x + 1;
+		y = rand() % max_y + 1;
+		fprintf (stderr, "%d", mvgetch(y,x));
+	} while(mvgetch(y,x) != -1);
+	
+	mvaddch(y, x, c);
+}
+
+
 int main(int argc, char **argv)
 {
+	srand(time(0));
 	int snake_size = 1;
 	char c = '#';
 	if(argc > 1){
@@ -65,6 +82,7 @@ int main(int argc, char **argv)
 		}
 		
 	move_snake(player, x_dir, y_dir);
+	place_target(col, row);
 	refresh();	
 	sleep(1);
 	}
