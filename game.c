@@ -20,18 +20,33 @@ static void init()
 
 void place_target(int max_x,int max_y)
 {
-	char c = '*';
-	int x, y;
+	char view = '*';
+	int x, y, c;
 	
-	do{
+	
+	/*do{
 		x = rand() % max_x + 1;
 		y = rand() % max_y + 1;
-		fprintf (stderr, "%d", mvgetch(y,x));
-	} while(mvgetch(y,x) != -1);
+		/* x must be an even number, because char height 2 times greater then its width*/		
+	/*	if(x%2 != 0) x = !x ? 0: x - 1;
+		c = mvgetch(y,x);
+	} while(c != -1 && c != ' ');*/
 	
-	mvaddch(y, x, c);
+	mvaddch(20, 20, view);
 }
 
+void check_collisions(struct snake *s, int dir_x, int dir_y)
+{
+	int collision_x = s->head->x + dir_x;
+	int collision_y = s->head->y + dir_y;
+	mvprintw(0,0,"%d : %d" , collision_x, s->head->x);
+	mvprintw(1,0,"%d : %d" , collision_y, s->head->y);
+	mvprintw(2,0,"%d" , mvgetch(20,20));
+
+	if(mvgetch(collision_y, collision_x) == '*'){ 
+		snake_add(s, collision_x, collision_y);
+	}
+}
 
 int main(int argc, char **argv)
 {
@@ -80,9 +95,10 @@ int main(int argc, char **argv)
 			y_dir =  0;
 			break;	
 		}
-		
-	move_snake(player, x_dir, y_dir);
 	place_target(col, row);
+	check_collisions(player, x_dir, y_dir);
+	move_snake(player, x_dir, y_dir);
+	
 	refresh();	
 	sleep(1);
 	}

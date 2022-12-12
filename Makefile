@@ -1,5 +1,6 @@
 OBJMODULES = snake.o
 CFLAGS = -g -Wall
+CC = gcc
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@

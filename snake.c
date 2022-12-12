@@ -2,16 +2,6 @@
 #include <stdlib.h>
 #include <ncurses.h>
 
-struct snake_item {
-		int x, y;
-		struct snake_item *next;
-};
-
-struct snake {
-	char view;
-	struct snake_item *tail, *head;
-};
-
 static void snake_put(struct snake *s, int x, int y)
 {
 	struct snake_item *tmp = malloc(sizeof(struct snake_item));
@@ -38,6 +28,9 @@ struct snake *create_snake(int cell_count, int x, int y, char c)
 {
 	struct snake *s = malloc(sizeof(struct snake));
 	s->view = c;
+	
+	/* x must be an even number, because char height 2 times greater then its width*/
+	if(x%2 != 0) x = !x? 0: x - 1; 
 		
 	for(int i = 0; i < cell_count; i++){
 		snake_put(s, x, y-i);
@@ -61,3 +54,12 @@ void move_snake(struct snake *s, int dx, int dy)
 	mvaddch(s->head->y, s->head->x, s->view);
 	snake_get(s);
 }
+
+void snake_add(struct snake *s, int x, int y)
+{
+	snake_put(s, x, y);
+	mvaddch(s->head->y, s->head->x, s->view);
+}
+
+
+
