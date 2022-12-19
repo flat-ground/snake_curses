@@ -22,35 +22,36 @@ void place_target(int max_x,int max_y)
 {
 	char view = '*';
 	int x, y, c;
-	
-	
-	/*do{
+		
+	do{
 		x = rand() % max_x + 1;
 		y = rand() % max_y + 1;
 		/* x must be an even number, because char height 2 times greater then its width*/		
-	/*	if(x%2 != 0) x = !x ? 0: x - 1;
-		c = mvgetch(y,x);
-	} while(c != -1 && c != ' ');*/
+		if(x%2 != 0) x = !x ? 0: x - 1;
+		c = mvinch(y,x)&A_CHARTEXT;
+		mvprintw(0,0,"%d", c);
+	} while(c != ' ');
 	
-	mvaddch(20, 20, view);
+	mvaddch(y, x, view);
 }
 
 void check_collisions(struct snake *s, int dir_x, int dir_y)
 {
+	s->is_stopped = 0;
+	
 	int collision_x = s->head->x + dir_x;
 	int collision_y = s->head->y + dir_y;
-	mvprintw(0,0,"%d : %d" , collision_x, s->head->x);
-	mvprintw(1,0,"%d : %d" , collision_y, s->head->y);
-	mvprintw(2,0,"%d" , mvgetch(20,20));
 
-	if(mvgetch(collision_y, collision_x) == '*'){ 
+	if(mvinch(collision_y, collision_x) == '*'){ 
 		snake_add(s, collision_x, collision_y);
+		s->is_stopped = 1; 
 	}
 }
 
 int main(int argc, char **argv)
 {
 	srand(time(0));
+	
 	int snake_size = 1;
 	char c = '#';
 	if(argc > 1){
@@ -68,7 +69,8 @@ int main(int argc, char **argv)
 	int x_dir = 0, y_dir = -1;
 	int last_key_pressed = KEY_UP;
 	
-	
+	struct timespec tw = {0,500000000};
+	struct timespec tr;
 	/* -Main loop- */
 		
 	while(1){
@@ -97,10 +99,13 @@ int main(int argc, char **argv)
 		}
 	place_target(col, row);
 	check_collisions(player, x_dir, y_dir);
-	move_snake(player, x_dir, y_dir);
+	
+	if(!player->is_stopped){
+		move_snake(player, x_dir, y_dir);	
+	}
 	
 	refresh();	
-	sleep(1);
+	nanosleep(&tw, &tr);
 	}
 	
 	getch();

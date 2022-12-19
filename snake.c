@@ -28,6 +28,7 @@ struct snake *create_snake(int cell_count, int x, int y, char c)
 {
 	struct snake *s = malloc(sizeof(struct snake));
 	s->view = c;
+	s->is_stopped = 0;
 	
 	/* x must be an even number, because char height 2 times greater then its width*/
 	if(x%2 != 0) x = !x? 0: x - 1; 

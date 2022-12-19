@@ -3,6 +3,7 @@
 
 struct snake {
 	char view;
+	int is_stopped;
 	struct snake_item *tail, *head;
 };
 
