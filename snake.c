@@ -28,7 +28,7 @@ struct snake *create_snake(int cell_count, int x, int y, char c)
 {
 	struct snake *s = malloc(sizeof(struct snake));
 	s->view = c;
-	s->is_stopped = 0;
+	set_snake_dir(s, 0, -1);
 	
 	/* x must be an even number, because char height 2 times greater then its width*/
 	if(x%2 != 0) x = !x? 0: x - 1; 
@@ -60,6 +60,12 @@ void snake_add(struct snake *s, int x, int y)
 {
 	snake_put(s, x, y);
 	mvaddch(s->head->y, s->head->x, s->view);
+}
+
+void set_snake_dir(struct snake *s, int x, int y)
+{
+	s->dir.x = x;
+	s->dir.y = y;
 }
 
 

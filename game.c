@@ -5,8 +5,7 @@
 #include <time.h>
 #include "snake.h"
 
-
-enum { key_escape = 27 };
+enum { key_escape = 27, apples = 16};
 
 static void init()
 {
@@ -35,16 +34,28 @@ void place_target(int max_x,int max_y)
 	mvaddch(y, x, view);
 }
 
+void create_level(int apples_count, int max_x,int max_y)
+{
+	for(int i = 0; i < apples_count; i++)
+		place_target(max_x, max_y);
+}
+
 void check_collisions(struct snake *s, int dir_x, int dir_y)
 {
-	s->is_stopped = 0;
 	
 	int collision_x = s->head->x + dir_x;
 	int collision_y = s->head->y + dir_y;
+	char c = mvinch(collision_y, collision_x);
 
-	if(mvinch(collision_y, collision_x) == '*'){ 
+	if( c == '*'){ 
 		snake_add(s, collision_x, collision_y);
-		s->is_stopped = 1; 
+	}
+	else if(!(dir_x + s->dir.x) && !(dir_y + s->dir.y)){ 
+		move_snake(s, s->dir.x, s->dir.y);
+	}
+	else {
+		move_snake(s, dir_x, dir_y);
+		set_snake_dir(s, dir_x, dir_y);
 	}
 }
 
@@ -63,6 +74,7 @@ int main(int argc, char **argv)
 	int row, col;
 	getmaxyx(stdscr, row, col);
 	
+	create_level(apples, col, row);
 	struct snake *player = create_snake(snake_size, col/2, row/2, c);
 	draw_snake(player);
 	
@@ -97,12 +109,7 @@ int main(int argc, char **argv)
 			y_dir =  0;
 			break;	
 		}
-	place_target(col, row);
 	check_collisions(player, x_dir, y_dir);
-	
-	if(!player->is_stopped){
-		move_snake(player, x_dir, y_dir);	
-	}
 	
 	refresh();	
 	nanosleep(&tw, &tr);
