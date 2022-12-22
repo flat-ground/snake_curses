@@ -2,7 +2,8 @@
 #define SNAKE_H_SENTRY
 
 struct snake {
-	/*enum state { up, down, right, left } state;*/
+	/*enum state { up, down, right, left,} state;*/
+	int stopped;
 	struct dir{ int x, y; } dir;
 	char view;
 	struct snake_item *tail, *head;

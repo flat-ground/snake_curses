@@ -42,20 +42,18 @@ void create_level(int apples_count, int max_x,int max_y)
 
 void check_collisions(struct snake *s, int dir_x, int dir_y)
 {
-	
-	int collision_x = s->head->x + dir_x;
-	int collision_y = s->head->y + dir_y;
-	char c = mvinch(collision_y, collision_x);
-
-	if( c == '*'){ 
-		snake_add(s, collision_x, collision_y);
-	}
-	else if(!(dir_x + s->dir.x) && !(dir_y + s->dir.y)){ 
-		move_snake(s, s->dir.x, s->dir.y);
-	}
-	else {
-		move_snake(s, dir_x, dir_y);
+	s->stopped = 0;
+	if(!((dir_x + s->dir.x == 0) && (dir_y + s->dir.y == 0))){ 
 		set_snake_dir(s, dir_x, dir_y);
+	}
+	
+	int collision_x = s->head->x + s->dir.x;
+	int collision_y = s->head->y + s->dir.y;
+	char c = mvinch(collision_y, collision_x);
+	
+	if( c == '*'){ 
+		s->stopped = 1; 
+		snake_add(s, collision_x, collision_y);
 	}
 }
 
@@ -110,6 +108,7 @@ int main(int argc, char **argv)
 			break;	
 		}
 	check_collisions(player, x_dir, y_dir);
+	move_snake(player, player->dir.x, player->dir.y);
 	
 	refresh();	
 	nanosleep(&tw, &tr);
