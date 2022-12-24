@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <time.h>
 #include "snake.h"
+#include "level_loader.h"
 
 enum { key_escape = 27, apples = 16, delay_nano = 500000000,
 		apple_view = '*', snake_view = 'X', wall = '#'};
@@ -30,7 +31,7 @@ void place_target(int max_x,int max_y, char v)
 		c = mvinch(y,x)&A_CHARTEXT;
 		/*mvprintw(0,0,"%d", c);*/
 	} while(c != ' ');
-	
+
 	mvaddch(y, x, v);
 }
 
@@ -76,6 +77,9 @@ int main(int argc, char **argv)
 	int row, col;
 	getmaxyx(stdscr, row, col);
 	
+	int loaded = load_level("./levels/1.txt");
+	loaded ? mvprintw(0,0,"NO SUCH FILE OR DIRECTORY:") : mvprintw(0,0,"%d", loaded);
+	
 	create_level(apples, col, row);
 	
 	/*for experimental purposes*/
@@ -115,7 +119,11 @@ int main(int argc, char **argv)
 		case KEY_LEFT:
 			x_dir = -2;
 			y_dir =  0;
-			break;	
+			break;
+		case 's':
+			int s = save_level("./save.txt");
+			s ? mvprintw(0,0,"    SAVING ERROR    ") : mvprintw(0,0,"      SAVED       ");
+				
 		}
 	check_collisions(player, x_dir, y_dir);
 	move_snake(player, player->dir.x, player->dir.y);
