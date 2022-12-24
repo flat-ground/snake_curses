@@ -5,7 +5,8 @@
 #include <time.h>
 #include "snake.h"
 
-enum { key_escape = 27, apples = 16};
+enum { key_escape = 27, apples = 16, delay_nano = 500000000,
+		apple_view = '*', snake_view = 'X', wall = '#'};
 
 static void init()
 {
@@ -17,9 +18,8 @@ static void init()
 	timeout(0);
 }
 
-void place_target(int max_x,int max_y)
+void place_target(int max_x,int max_y, char v)
 {
-	char view = '*';
 	int x, y, c;
 		
 	do{
@@ -28,16 +28,16 @@ void place_target(int max_x,int max_y)
 		/* x must be an even number, because char height 2 times greater then its width*/		
 		if(x%2 != 0) x = !x ? 0: x - 1;
 		c = mvinch(y,x)&A_CHARTEXT;
-		mvprintw(0,0,"%d", c);
+		/*mvprintw(0,0,"%d", c);*/
 	} while(c != ' ');
 	
-	mvaddch(y, x, view);
+	mvaddch(y, x, v);
 }
 
 void create_level(int apples_count, int max_x,int max_y)
 {
 	for(int i = 0; i < apples_count; i++)
-		place_target(max_x, max_y);
+		place_target(max_x, max_y, apple_view);
 }
 
 void check_collisions(struct snake *s, int dir_x, int dir_y)
@@ -51,9 +51,15 @@ void check_collisions(struct snake *s, int dir_x, int dir_y)
 	int collision_y = s->head->y + s->dir.y;
 	char c = mvinch(collision_y, collision_x);
 	
-	if( c == '*'){ 
-		s->stopped = 1; 
-		snake_add(s, collision_x, collision_y);
+	switch (c)
+	{
+		case apple_view:
+			s->stopped = 1; 
+			snake_add(s, collision_x, collision_y);
+			break;
+		case wall:
+			s->stopped = 1;
+			break;
 	}
 }
 
@@ -62,10 +68,8 @@ int main(int argc, char **argv)
 	srand(time(0));
 	
 	int snake_size = 1;
-	char c = '#';
 	if(argc > 1){
 		snake_size = atoi(argv[1]);
-		if(argc > 2) c = *argv[2];
 	}
 	
 	init();
@@ -73,13 +77,19 @@ int main(int argc, char **argv)
 	getmaxyx(stdscr, row, col);
 	
 	create_level(apples, col, row);
-	struct snake *player = create_snake(snake_size, col/2, row/2, c);
+	
+	/*for experimental purposes*/
+	for(int i = 0; i < 20; i++)
+		place_target(col, row, wall);
+	/**/
+	
+	struct snake *player = create_snake(snake_size, col/2, row/2, snake_view);
 	draw_snake(player);
 	
 	int x_dir = 0, y_dir = -1;
 	int last_key_pressed = KEY_UP;
 	
-	struct timespec tw = {0,500000000};
+	struct timespec tw = {0, delay_nano};
 	struct timespec tr;
 	/* -Main loop- */
 		
