@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 			y_dir =  0;
 			break;
 		case 's':
-			int s = save_level("./save.txt");
+			int s = save_level("./save.txt", row, col);
 			s ? mvprintw(0,0,"    SAVING ERROR    ") : mvprintw(0,0,"      SAVED       ");
 				
 		}
